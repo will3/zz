@@ -1,0 +1,20 @@
+{
+  "name": "zz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "watchify src/index.js -t babelify -o js/bundle.js --debug --verbose"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babelify": "^7.3.0",
+    "voxel": "^0.5.0"
+  },
+  "dependencies": {
+    "simplex-noise": "^2.3.0",
+    "voxel-ecs": "file:///Users/will3/voxel-ecs"
+  }
+}
