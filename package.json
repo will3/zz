@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "watchify src/index.js -t babelify -o js/bundle.js --debug --verbose"
+    "build": "watchify src/index.js -t babelify -o js/bundle.js --debug --verbose",
+    "pull": "npm uninstall voxel-ecs --save && npm install ../voxel-ecs --save"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +17,6 @@
   "dependencies": {
     "keycode": "^2.1.9",
     "simplex-noise": "^2.3.0",
-    "voxel-ecs": "file:///Users/will3/voxel-ecs"
+    "voxel-ecs": "file:///C:\\Users\\OEM\\code\\voxel-ecs"
   }
 }

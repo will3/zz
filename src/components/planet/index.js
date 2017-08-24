@@ -4,7 +4,6 @@ var SimplexNoise = require('simplex-noise');
 var Block = require('./block');
 var Surface = require('./surface');
 var Connection = require('./connection');
-var input = require('../../input');
 
 class Planet extends Voxel.Blocks {
 	constructor() {
@@ -14,6 +13,11 @@ class Planet extends Voxel.Blocks {
 		this.blocks = {};
 		this.blocksWithSurface = {};
 		this.connections = {};
+		this.guiLayer = new THREE.Object3D();
+		this.critterLayer = new THREE.Object3D();
+
+		this.object.add(this.guiLayer);
+		this.object.add(this.critterLayer);
 
 		this.debugShowSurfaces = false;
 		this.debugShowConnections = false;
@@ -22,9 +26,18 @@ class Planet extends Voxel.Blocks {
 	start() {
 		super.start();
 
-		this.offset.set(-this.size / 2, -this.size / 2, -this.size / 2);
+		this.input = this.app.shared.input;
+		this.camera = this.app.shared.camera;
+
+		var offset = new THREE.Vector3(-this.size / 2, -this.size / 2, -this.size / 2);
+		this.innerObject.position.copy(offset);
+		this.guiLayer.position.copy(offset);
+		this.critterLayer.position.copy(offset);
+
 		this.material.push(new THREE.MeshLambertMaterial({
-			color: 0xffffff
+			color: 0xffffff,
+			// transparent: true,
+			// opacity: 0.1
 		}));
 
 		this.initBlocks();
@@ -40,26 +53,55 @@ class Planet extends Voxel.Blocks {
 		super.tick();
 
 		var right = 0;
-		if (input.keyholds['left']) {
+		if (this.input.keyholds['left']) {
 			right--;
 		}
 
-		if (input.keyholds['right']) {
+		if (this.input.keyholds['right']) {
 			right++;
 		}
 
 		var up = 0;
 
-		if (input.keyholds['up']) {
+		if (this.input.keyholds['up']) {
 			up++;
 		}
 
-		if (input.keyholds['down']) {
+		if (this.input.keyholds['down']) {
 			up--;
 		}
 
 		this.object.rotation.y += right * 0.1;
 		this.object.rotation.x += up * 0.1;
+	}
+
+	getSurfaceFromRay(raycaster) {
+		var intersects = raycaster.intersectObject(this.innerObject, true);
+		if (intersects.length === 0) {
+			return null;
+		}
+		var point = intersects[0].point;
+		var dir = point.clone().sub(this.camera.position).setLength(0.01);
+		var coordBelow = this.worldPointToCoords(point.clone().add(dir));
+		var coordAbove = this.worldPointToCoords(point.clone().sub(dir));
+
+		var dir = coordAbove.clone().sub(coordBelow);
+
+		return this.getSurface(coordBelow, dir);
+	}
+
+	getSurface(coord, dir) {
+		var id = coord.toArray().join(',') + ',' + dir.toArray().join(',');
+		return this.surfaces[id];
+	}
+
+	worldPointToCoords(point) {
+		var localPoint = this.innerObject.worldToLocal(point);
+		return new THREE.Vector3(
+			Math.floor(localPoint.x),
+			Math.floor(localPoint.y),
+			Math.floor(localPoint.z) 
+		);
 	}
 
 	initBlocks() {
