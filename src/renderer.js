@@ -18,7 +18,7 @@ function render() {
 var directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(0.3, 1.0, 0.5);
 scene.add(directionalLight);
-var ambientLight = new THREE.AmbientLight(0x888888);
+var ambientLight = new THREE.AmbientLight(0x555555);
 scene.add(ambientLight);
 
 module.exports = {

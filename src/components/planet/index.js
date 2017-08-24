@@ -4,6 +4,7 @@ var SimplexNoise = require('simplex-noise');
 var Block = require('./block');
 var Surface = require('./surface');
 var Connection = require('./connection');
+var input = require('../../input');
 
 class Planet extends Voxel.Blocks {
 	constructor() {
@@ -15,7 +16,7 @@ class Planet extends Voxel.Blocks {
 		this.connections = {};
 
 		this.debugShowSurfaces = false;
-		this.debugShowConnections = true;
+		this.debugShowConnections = false;
 	}
 
 	start() {
@@ -33,6 +34,32 @@ class Planet extends Voxel.Blocks {
 		this.initSurfaces();
 
 		this.initConnections();
+	}
+
+	tick() {
+		super.tick();
+
+		var right = 0;
+		if (input.keyholds['left']) {
+			right--;
+		}
+
+		if (input.keyholds['right']) {
+			right++;
+		}
+
+		var up = 0;
+
+		if (input.keyholds['up']) {
+			up++;
+		}
+
+		if (input.keyholds['down']) {
+			up--;
+		}
+
+		this.object.rotation.y += right * 0.1;
+		this.object.rotation.x += up * 0.1;
 	}
 
 	initBlocks() {
