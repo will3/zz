@@ -17,14 +17,14 @@ app.shared.planet = planet;
 app.add(planet);
 
 var controller = new Controller();
+app.shared.controller = controller;
 app.add(controller);
 
 var camera = new Camera(renderer.camera);
 app.add(camera);
 
-app.shared.textures = require('./textures');
-
 app.shared.materials = require('./materials');
+app.shared.geometries = require('./geometries');
 
 function animate() {
 	tick();

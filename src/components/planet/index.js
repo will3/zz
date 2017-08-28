@@ -9,9 +9,10 @@ class Planet extends Voxel.Blocks {
 	constructor() {
 		super();
 		this.size = 24;
-		this.surfaces = {};
 		this.blocks = {};
 		this.blocksWithSurface = {};
+		this.surfaces = {};
+		this.surfacesByPointAbove = {};
 		this.connections = {};
 		this.guiLayer = new THREE.Object3D();
 		this.critterLayer = new THREE.Object3D();
@@ -116,7 +117,7 @@ class Planet extends Voxel.Blocks {
 	}
 
 	initHeightMap() {
-		var maxDepth = 1;
+		var maxDepth = 3;
 		var simplex = new SimplexNoise();
 		var nf = 0.04;
 
@@ -216,6 +217,12 @@ class Planet extends Voxel.Blocks {
 				var surface = new Surface(block, dir);
 
 				surfaces[surface.id] = surface;
+
+				if (this.surfacesByPointAbove[surface.pointAboveId] == null) {
+					this.surfacesByPointAbove[surface.pointAboveId] = [];
+				}
+				this.surfacesByPointAbove[surface.pointAboveId].push(surface);
+
 				block.surfaces.push(surface);
 
 				id = block.coords.join(',');
@@ -292,6 +299,7 @@ class Planet extends Voxel.Blocks {
 						if (surface.pointAboveVector.distanceTo(surfaceb.pointAboveVector) < 1.5) {
 							var connection = new Connection(surface, surfaceb);
 							this.connections[connection.id] = connection;
+							surface.connections.push(connection);
 						}
 					}
 				}
@@ -302,6 +310,72 @@ class Planet extends Voxel.Blocks {
 	getBlock(i, j, k) {
 		var id = [i, j, k].join(',');
 		return this.blocks[id];
+	}
+
+	getPath(a, b) {
+		if (a.connections.length === 0) {
+			return null;
+		}
+
+		if (a.id === b.id) {
+			return null;
+		}
+
+		var distance = a.position.distanceTo(b.position);
+
+		var options = [];
+
+		for (var i = 0; i < a.connections.length; i++) {
+			var connection = a.connections[i];
+			var next = connection.b;
+			var nextDistance = next.position.distanceTo(b.position);
+
+			if (distance <= nextDistance) {
+				continue;
+			}
+
+			if (next.hasObject) {
+				continue;
+			}
+
+			var weight = (nextDistance - distance);
+
+			options.push({
+				connection: connection,
+				weight: weight
+			});
+		}
+
+		if (options.length === 0) {
+			return null;
+		}
+
+		var options = options.sort((a, b) => {
+			return a.weight - b.weight;
+		});
+
+		var optionsWithSameWeight = [];
+		var weight = options[0].weight;
+		for (var i = 0; i < options.length; i++) {
+			if (options[i].weight === weight) {
+				optionsWithSameWeight.push(options[i]);
+			} else {
+				break;
+			}
+		}
+
+		return optionsWithSameWeight[Math.floor(Math.random() * optionsWithSameWeight.length)].connection;
+	}
+
+	setSurfaceEnterObject(surface) {
+		var surfaces = this.surfacesByPointAbove[surface.pointAboveId];
+		for(var i = 0; i < surfaces.length; i++) {
+			surfaces[i].hasObject = true;
+		}
+	}
+
+	setSurfaceLeaveObject(surface) {
+		surface.hasObject = false;
 	}
 };
 

@@ -1,5 +1,5 @@
 var THREE = require('three');
-var Critter = require('../critter');
+var Diamond = require('../critters/diamond');
 
 class Controller {
 	constructor() {
@@ -24,9 +24,13 @@ class Controller {
 
 		if (this.debugAddCritterOnClick) {
 			if (this.lastSurface != null && this.input.mouseDowns[0]) {
-				var critter = new Critter();
-				this.app.add(critter);
+				var critter = new Diamond();
 				critter.surface = this.lastSurface;
+				this.app.add(critter);
+			}
+
+			if (this.lastSurface != null && this.input.mouseHolds[2]) {
+				
 			}
 		}
 	}

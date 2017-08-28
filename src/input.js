@@ -3,8 +3,6 @@ var THREE = require('three');
 
 class Input {
 	constructor(app, camera) {
-		this.keyholds = {};
-
 		this.camera = camera;
 
 		this.mouse = new THREE.Vector2();
@@ -12,8 +10,10 @@ class Input {
 		this.mouseRaycaster = new THREE.Raycaster();
 		this.keyDowns = {};
 		this.keyUps = {};
+		this.keyholds = {};
 		this.mouseDowns = {};
 		this.mouseUps = {};
+		this.mouseHolds = {};
 
 		this.onKeyDown = this.onKeyDown.bind(this);
 		this.onKeyUp = this.onKeyUp.bind(this);
@@ -55,10 +55,12 @@ class Input {
 
 	onMouseDown(e) {
 		this.mouseDowns[e.button] = true;
+		this.mouseHolds[e.button] = true;
 	}
 
 	onMouseUp(e) {
 		this.mouseUps[e.button] = true;
+		this.mouseHolds[e.button] = false;
 	}
 
 	afterTick() {

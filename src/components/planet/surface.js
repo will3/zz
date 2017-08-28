@@ -6,6 +6,9 @@ class Surface {
 		this.dir = dir;
 		this.dirType = dir.join(',');
 		this.dirVector = new THREE.Vector3().fromArray(this.dir);
+		this.hasObject = false;
+
+		this.connections = [];
 
 		this.center = [
 			block.center[0] + (dir[0] / 2),
@@ -13,7 +16,7 @@ class Surface {
 			block.center[2] + (dir[2] / 2),
 		];
 
-		this.centerVector = new THREE.Vector3().fromArray(this.center);
+		this.position = this.centerVector = new THREE.Vector3().fromArray(this.center);
 
 		this.pointAbove = [
 			block.center[0] + this.dir[0],
@@ -22,6 +25,7 @@ class Surface {
 		];
 
 		this.pointAboveVector = new THREE.Vector3().fromArray(this.pointAbove);
+		this.pointAboveId = this.pointAbove.join(',');
 
 		this.id = block.coords.join(',') + ',' + dir.join(',');
 
